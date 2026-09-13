@@ -1,6 +1,5 @@
 package com.eventhub.api.service;
 
-import com.eventhub.api.Exception.OrderNotFoundException;
 import com.eventhub.api.dto.OrderCreateRequestDto;
 import org.springframework.stereotype.Service;
 
