@@ -1,5 +1,6 @@
 package com.eventhub.api.controller;
 
+import com.eventhub.api.Exception.OrderNotFoundException;
 import com.eventhub.api.dto.OrderCreateRequestDto;
 import com.eventhub.api.service.OrderService;
 import jakarta.validation.Valid;
@@ -21,6 +22,11 @@ public class OrderController {
     @PostMapping("/orders")
     public String createOrder(@Valid @RequestBody OrderCreateRequestDto order){
        return orderService.createOrder(order);
+
+    }
+    @PostMapping("/eyp")
+    public String errorTest(@Valid @RequestBody OrderCreateRequestDto order){
+        throw new OrderNotFoundException(order.customerId());
 
     }
 }
