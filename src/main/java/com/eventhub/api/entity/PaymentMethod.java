@@ -1,4 +1,4 @@
-package com.eventhub.api.dto;
+package com.eventhub.api.entity;
 
 public enum PaymentMethod {
     CREDIT_CARD,

@@ -22,4 +22,26 @@ public class OrderItem {
 
     protected OrderItem() {
     }
+
+    public OrderItem(UUID productId, Integer quantity, BigDecimal unitPrice) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+    }
+
+    public void setOrder(Order order){
+        this.order=order;
+    }
+
+    public UUID getProductId() {
+        return productId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
 }
