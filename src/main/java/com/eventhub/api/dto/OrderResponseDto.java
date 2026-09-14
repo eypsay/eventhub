@@ -4,6 +4,7 @@ import com.eventhub.api.entity.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record OrderResponseDto(
@@ -12,6 +13,7 @@ public record OrderResponseDto(
         BigDecimal totalAmount,
         String currency,
         OrderStatus status,
-        Instant createdAt
+        Instant createdAt,
+        List<OrderItemResponseDto> items
 ) {
 }
