@@ -1,6 +1,6 @@
 package com.eventhub.api.controller;
 
-import com.eventhub.api.Exception.OrderNotFoundException;
+import com.eventhub.api.exception.OrderNotFoundException;
 import com.eventhub.api.dto.OrderCreateRequestDto;
 import com.eventhub.api.service.OrderService;
 import jakarta.validation.Valid;

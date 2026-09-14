@@ -17,7 +17,7 @@ public class OrderItem {
     private Integer quantity;
     private BigDecimal unitPrice;
     @ManyToOne
-    @JoinColumn(name="order_id",nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     protected OrderItem() {
@@ -29,8 +29,8 @@ public class OrderItem {
         this.unitPrice = unitPrice;
     }
 
-    public void setOrder(Order order){
-        this.order=order;
+    void setOrder(Order order) {
+        this.order = order;
     }
 
     public UUID getProductId() {
@@ -43,5 +43,9 @@ public class OrderItem {
 
     public BigDecimal getUnitPrice() {
         return unitPrice;
+    }
+
+    public Order getOrder() {
+        return order;
     }
 }

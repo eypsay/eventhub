@@ -1,4 +1,4 @@
-package com.eventhub.api.Exception;
+package com.eventhub.api.exception;
 
 public class EventHubException extends RuntimeException {
     private final String code;

@@ -44,7 +44,8 @@ public class Order {
         this.totalAmount = BigDecimal.ZERO;
         this.createdAt = Instant.now();
     }
-    public List<OrderItem> getItems(){
+
+    public List<OrderItem> getItems() {
         return Collections.unmodifiableList(items);
     }
 
@@ -52,7 +53,27 @@ public class Order {
         return createdAt;
     }
 
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
     public void addItem(OrderItem item) {
+        //Aynı item'ı aynı Order'a iki kere ekleme:
+        if (items.contains(item)) {
+            throw new IllegalArgumentException(
+                    "Order item has already been added"
+            );
+        }
+        //Bir Order'a ait item'ı başka Order'a ekleme:
+        if (item.getOrder() != null && item.getOrder() != this) {
+            throw new IllegalArgumentException(
+                    "Order item already belongs to another order"
+            );
+        }
         items.add(item);
         item.setOrder(this);
 
@@ -69,6 +90,24 @@ public class Order {
 
             item.setOrder(null);
         }
+    }
+
+    public void markAsPaid() {
+        if (status != OrderStatus.CREATED) {
+            throw new IllegalStateException(
+                    "Only CREATED orders can be marked as PAID"
+            );
+        }
+        this.status = OrderStatus.PAID;
+    }
+
+    public void cancel() {
+        if (status != OrderStatus.CREATED && status != OrderStatus.PAID) {
+            throw new IllegalStateException(
+                    "Only CREATED or PAID orders can be cancelled"
+            );
+        }
+        this.status = OrderStatus.CANCELLED;
     }
 
 }

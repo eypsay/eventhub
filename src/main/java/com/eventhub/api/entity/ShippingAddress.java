@@ -1,5 +1,7 @@
 package com.eventhub.api.entity;
+
 import jakarta.persistence.Embeddable;
+
 @Embeddable
 public class ShippingAddress {
     private String recipientName;
@@ -8,7 +10,7 @@ public class ShippingAddress {
     private String postalCode;
     private String country;
 
-    protected  ShippingAddress() {
+    protected ShippingAddress() {
     }
 
     public ShippingAddress(String recipientName, String addressLine, String city, String postalCode, String country) {
