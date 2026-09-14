@@ -10,6 +10,29 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OrderTest {
     //System.out.println("ORDER:OrderStatus: " + order.getStatus());
     //System.out.println("ORDER:OrderStatus markAsPaid: " + order.getStatus());
+    private Order createOrder() {
+        return new Order(
+                UUID.randomUUID(),
+                "TRY",
+                PaymentMethod.CREDIT_CARD,
+                new ShippingAddress(
+                        "eyp say",
+                        "Ataturk mh",
+                        "Gaziantep",
+                        "27000",
+                        "TR"
+                )
+        );
+    }
+
+    private OrderItem createOrderItem() {
+        return new OrderItem(
+                UUID.randomUUID(),
+                2,
+                new BigDecimal("125.50")
+        );
+    }
+
     @Test
     void shouldMarkCreatedOrderAsPaid() {
         Order order = new Order(
@@ -375,6 +398,122 @@ public class OrderTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> order2.addItem(item)
+        );
+    }
+
+    @Test
+    void shouldCompletePaidOrder() {
+        Order order = new Order(
+                UUID.randomUUID(),
+                "TRY",
+                PaymentMethod.CREDIT_CARD,
+                new ShippingAddress(
+                        "eyp say",
+                        "Ataturk mh",
+                        "Gaziantep",
+                        "27000",
+                        "TR"
+                )
+        );
+        order.markAsPaid();
+        order.markAsCompleted();
+        assertEquals(OrderStatus.COMPLETED, order.getStatus());
+    }
+
+    @Test
+    void shouldFailPaidOrder() {
+        Order order = new Order(
+                UUID.randomUUID(),
+                "TRY",
+                PaymentMethod.CREDIT_CARD,
+                new ShippingAddress(
+                        "eyp say",
+                        "Ataturk mh",
+                        "Gaziantep",
+                        "27000",
+                        "TR"
+                )
+        );
+        order.markAsPaid();
+        order.markAsFailed();
+        assertEquals(OrderStatus.FAILED, order.getStatus());
+    }
+
+    @Test
+    void shouldNotMarkCompletedOrderAsPaid() {
+        Order order = new Order(
+                UUID.randomUUID(),
+                "TRY",
+                PaymentMethod.CREDIT_CARD,
+                new ShippingAddress(
+                        "eyp say",
+                        "Ataturk mh",
+                        "Gaziantep",
+                        "27000",
+                        "TR"
+                )
+        );
+        order.markAsPaid();
+        order.markAsCompleted();
+        assertThrows(
+                IllegalStateException.class,
+                order::markAsPaid
+        );
+    }
+
+    @Test
+    void shouldNotMarkFailedOrderAsPaid() {
+        Order order = new Order(
+                UUID.randomUUID(),
+                "TRY",
+                PaymentMethod.CREDIT_CARD,
+                new ShippingAddress(
+                        "eyp say",
+                        "Ataturk mh",
+                        "Gaziantep",
+                        "27000",
+                        "TR"
+                )
+        );
+        order.markAsPaid();
+        order.markAsFailed();
+        assertThrows(
+                IllegalStateException.class,
+                order::markAsPaid
+        );
+    }
+
+    @Test
+    void shouldNotCancelCompletedOrder() {
+        Order order = createOrder();
+        order.markAsPaid();
+        order.markAsCompleted();
+        assertThrows(IllegalStateException.class, order::cancel);
+    }
+
+    @Test
+    void shouldNotCompleteFailedOrder() {
+        Order order = createOrder();
+
+        order.markAsPaid();
+        order.markAsFailed();
+
+        assertThrows(
+                IllegalStateException.class,
+                order::markAsCompleted
+        );
+    }
+
+    @Test
+    void shouldNotCancelFailedOrder() {
+        Order order = createOrder();
+
+        order.markAsPaid();
+        order.markAsFailed();
+
+        assertThrows(
+                IllegalStateException.class,
+                order::cancel
         );
     }
 }

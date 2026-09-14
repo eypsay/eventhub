@@ -101,6 +101,24 @@ public class Order {
         this.status = OrderStatus.PAID;
     }
 
+    public void markAsCompleted() {
+        if (status != OrderStatus.PAID) {
+            throw new IllegalStateException(
+                    "Only PAID orders can be marked as COMPLETED"
+            );
+        }
+        this.status = OrderStatus.COMPLETED;
+    }
+
+    public void markAsFailed() {
+        if (status != OrderStatus.PAID) {
+            throw new IllegalStateException(
+                    "Only PAID orders can be marked as FAILED");
+        }
+        this.status = OrderStatus.FAILED;
+    }
+
+
     public void cancel() {
         if (status != OrderStatus.CREATED && status != OrderStatus.PAID) {
             throw new IllegalStateException(
