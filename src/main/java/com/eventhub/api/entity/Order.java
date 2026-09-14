@@ -61,6 +61,18 @@ public class Order {
         return totalAmount;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public UUID getCustomerId() {
+        return customerId;
+    }
+
     public void addItem(OrderItem item) {
         //Aynı item'ı aynı Order'a iki kere ekleme:
         if (items.contains(item)) {

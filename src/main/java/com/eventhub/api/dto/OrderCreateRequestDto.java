@@ -14,8 +14,7 @@ public record OrderCreateRequestDto(
         @NotNull
         UUID customerId,
         @NotEmpty
-        @Valid
-        List<OrderItemRequestDto> items,
+        List<@Valid OrderItemRequestDto> items,
         @NotBlank
         @Size(min = 3, max = 3)
         String currency,
