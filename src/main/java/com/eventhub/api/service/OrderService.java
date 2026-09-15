@@ -3,16 +3,20 @@ package com.eventhub.api.service;
 import com.eventhub.api.dto.*;
 import com.eventhub.api.entity.Order;
 import com.eventhub.api.entity.OrderItem;
+import com.eventhub.api.entity.OutboxEvent;
 import com.eventhub.api.entity.ShippingAddress;
+import com.eventhub.api.event.OrderCreatedEventPayload;
 import com.eventhub.api.exception.InvalidSortFieldException;
 import com.eventhub.api.exception.OrderNotFoundException;
 import com.eventhub.api.repository.OrderRepository;
+import com.eventhub.api.repository.OutboxEventRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +32,13 @@ public class OrderService {
             "totalAmount"
     );
     private final OrderRepository orderRepository;
+    private final OutboxEventRepository outboxEventRepository;
+    private final ObjectMapper objectMapper;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper) {
         this.orderRepository = orderRepository;
+        this.outboxEventRepository = outboxEventRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -60,13 +68,44 @@ public class OrderService {
         }
         orderRepository.save(order);
 
+        //Outbox oluştur
+        OrderCreatedEventPayload payload = new OrderCreatedEventPayload(
+                order.getId(),
+                order.getCustomerId(),
+                order.getTotalAmount(),
+                order.getCurrency()
+        );
+        String payloadJson = serializePayload(payload);
 
+        OutboxEvent outboxEvent = new OutboxEvent(
+                UUID.randomUUID(),
+                "ORDER_CREATED",
+                "ORDER",
+                order.getId(),
+                payloadJson
+        );
+        outboxEventRepository.save(outboxEvent);
+        //Test için eklendi
+        // throw new RuntimeException("TEST OUTBOX ROLLBACK");
+
+        //
         return new OrderCreateResponseDto(
                 order.getId(),
                 order.getStatus(),
                 order.getTotalAmount(),
                 order.getCurrency()
         );
+    }
+
+    private String serializePayload(OrderCreatedEventPayload payload) {
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (Exception exception) {
+            throw new IllegalStateException(
+                    "Failed to serialize ORDER_CREATED event payload",
+                    exception
+            );
+        }
     }
 
     @Transactional(readOnly = true)
