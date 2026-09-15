@@ -7,7 +7,6 @@ import com.eventhub.api.dto.PageResponseDto;
 import com.eventhub.api.exception.OrderNotFoundException;
 import com.eventhub.api.service.OrderService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -33,14 +32,11 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
-
-
     }
 
     @PostMapping("/eyp")
     public String errorTest(@Valid @RequestBody OrderCreateRequestDto order) {
         throw new OrderNotFoundException(order.customerId());
-
     }
 
     @GetMapping("/orders/{orderId}")

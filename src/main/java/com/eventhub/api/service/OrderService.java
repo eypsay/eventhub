@@ -8,7 +8,9 @@ import com.eventhub.api.exception.InvalidSortFieldException;
 import com.eventhub.api.exception.OrderNotFoundException;
 import com.eventhub.api.repository.OrderRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,7 +152,9 @@ public class OrderService {
             }
         });
 
-        Page<Order> orderPage = orderRepository.findAll(pageable);
+        Pageable normalizedPageable = normalizeOrderPageable(pageable);
+
+        Page<Order> orderPage = orderRepository.findAll(normalizedPageable);
 
         if (orderPage.isEmpty()) {
             return new PageResponseDto<>(
@@ -204,6 +208,28 @@ public class OrderService {
                 orderPage.getTotalPages(),
                 orderPage.isFirst(),
                 orderPage.isLast()
+        );
+    }
+
+    private Pageable normalizeOrderPageable(Pageable pageable) {
+        Sort sort = pageable.getSort();
+        if (sort.isUnsorted()) {
+            sort = Sort.by(Sort.Order.desc("createdAt"));
+        }
+        sort.forEach(order -> {
+            if (!ALLOWED_SORT_FIELDS.contains(order.getProperty())) {
+                throw new InvalidSortFieldException(order.getProperty());
+            }
+        });
+        if (sort.getOrderFor("id") == null) {
+            sort = sort.and(
+                    Sort.by(Sort.Order.asc("id"))
+            );
+        }
+        return PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
         );
     }
 }
