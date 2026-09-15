@@ -13,12 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "createdAt",
+            "totalAmount"
+    );
     private final OrderRepository orderRepository;
 
     public OrderService(OrderRepository orderRepository) {
@@ -134,8 +139,18 @@ public class OrderService {
     }
 
      */
+
     @Transactional
     public PageResponseDto<OrderResponseDto> getAllOrders(Pageable pageable) {
+       //Whitelist : Client istediği alanı değil, bizim izin verdiğimiz alanları sıralayabilsin.
+        pageable.getSort().forEach(order-> {
+            if(!ALLOWED_SORT_FIELDS.contains((order.getProperty()))){
+                throw new IllegalArgumentException(
+                        "Sorting by field '" + order.getProperty() + "' is not allowed"
+                );
+            }
+        });
+
         Page<Order> orderPage = orderRepository.findAll(pageable);
 
         if (orderPage.isEmpty()) {
