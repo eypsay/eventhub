@@ -4,6 +4,7 @@ import com.eventhub.api.dto.*;
 import com.eventhub.api.entity.Order;
 import com.eventhub.api.entity.OrderItem;
 import com.eventhub.api.entity.ShippingAddress;
+import com.eventhub.api.exception.InvalidSortFieldException;
 import com.eventhub.api.exception.OrderNotFoundException;
 import com.eventhub.api.repository.OrderRepository;
 import org.springframework.data.domain.Page;
@@ -142,12 +143,10 @@ public class OrderService {
 
     @Transactional
     public PageResponseDto<OrderResponseDto> getAllOrders(Pageable pageable) {
-       //Whitelist : Client istediği alanı değil, bizim izin verdiğimiz alanları sıralayabilsin.
-        pageable.getSort().forEach(order-> {
-            if(!ALLOWED_SORT_FIELDS.contains((order.getProperty()))){
-                throw new IllegalArgumentException(
-                        "Sorting by field '" + order.getProperty() + "' is not allowed"
-                );
+        //Whitelist : Client istediği alanı değil, bizim izin verdiğimiz alanları sıralayabilsin.
+        pageable.getSort().forEach(order -> {
+            if (!ALLOWED_SORT_FIELDS.contains((order.getProperty()))) {
+                throw new InvalidSortFieldException(order.getProperty());
             }
         });
 
