@@ -16,19 +16,24 @@ public class OutboxPublisherService {
         this.outboxEventRepository = outboxEventRepository;
     }
 
-    @Transactional(readOnly = true)
-    public void publishPendingEvents() {
+    @Transactional()
+    public void claimPendingEvents() {
         List<OutboxEvent> events = outboxEventRepository.findByStatus(OutboxStatus.PENDING);
 
         for (OutboxEvent event : events) {
-            System.out.println(
-                    "PENDING EVENT: " +
-                            "eventId=" + event.getEventId() +
-                            ", eventType=" + event.getEventType() +
-                            ", aggregateId=" + event.getAggregateId() +
-                            ", payload=" + event.getPayload()
-            );
+            int claimed = outboxEventRepository.claim(event.getId(),
+                    OutboxStatus.PENDING,
+                    OutboxStatus.PROCESSING);
+            if (claimed == 1) {
+                System.out.println(
+                        "CLAIMED EVENT: " +
+                                "eventId=" + event.getEventId() +
+                                ", eventType=" + event.getEventType() +
+                                ", aggregateId=" + event.getAggregateId() +
+                                ", payload=" + event.getPayload()
+                );
 
+            }
         }
     }
 }

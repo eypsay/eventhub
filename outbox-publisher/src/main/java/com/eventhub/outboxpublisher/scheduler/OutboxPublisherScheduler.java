@@ -14,7 +14,7 @@ public class OutboxPublisherScheduler {
 
     @Scheduled(fixedDelay = 5000)
     public void publishPendingEvents() {
-        outboxPublisherService.publishPendingEvents();
+        outboxPublisherService.claimPendingEvents();
 
     }
 }
